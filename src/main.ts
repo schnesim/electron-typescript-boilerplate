@@ -1,15 +1,18 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
+const client = process.env.NODE_ENV === 'development' ? require('electron-connect').client : void 0;
 
 app.on('ready', function () {
   var mainWindow = new BrowserWindow({
     width: 800, height: 600, minWidth: 800, webPreferences: {
       experimentalFeatures: true,
     },
-    title: 'bookmark0r'
+    title: 'electron-typescript-boilerplate'
   });
   mainWindow.loadURL('file://' + __dirname + '/index.html');
-  console.log(path.dirname);
+  if (client !== void 0) {
+    client.create(mainWindow);
+  }
 });
 
 app.on('window-all-closed', function () {
