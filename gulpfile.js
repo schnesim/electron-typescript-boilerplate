@@ -21,7 +21,6 @@ gulp.task('serve', () => {
 });
 
 gulp.task('watch', () => {
-  // electron.start(callback);
   gulp.watch(['./src/*.html', './src/*.css'], () => {
     runSequnce('copy', 'electron-reload');
   });
@@ -35,6 +34,7 @@ gulp.task('watch', () => {
   });
 })
 
+// Copies everything "static" to the destination folder
 gulp.task('copy', () => {
   gulp.src(['./src/**/*', '!./src/**/*.ts']).pipe(gulp.dest('dist'));
 })
@@ -53,21 +53,28 @@ gulp.task('transpile', () => {
 })
 
 const callback = function (electronProcState) {
-  console.log('electron process state: ' + electronProcState);
   if (electronProcState == 'stopped') {
     process.exit();
   }
 };
 
+gulp.task('electron-download', () => {
+  return electron.dest('./electron-build', {
+    version: '1.7.5',
+    platform: 'win32'
+  })
+})
+
 gulp.task('electron:build:osx', function () {
     gulp.src(['dist/**/*'])
         .pipe(electron({
             version: '1.7.5',
-            platform: 'darwin'
+            platform: 'win32'
         }))
         .pipe(symdest('packages/osx'));
 });
 
+// Obviously we want a nice executable for our application. So this task gracefully does the job for us.
 gulp.task('package', function (done) {
-    return runSequnce('build', 'electron:build:osx', done);
+    return runSequnce('build', 'electron-download', 'electron:build:osx', done);
 });
